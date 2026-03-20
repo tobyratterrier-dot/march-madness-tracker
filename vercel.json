@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/api/update-group",
+      "schedule": "*/5 * * * *"
+    }
+  ]
+}
