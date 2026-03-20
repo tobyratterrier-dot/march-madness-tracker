@@ -178,16 +178,16 @@ export default function HomePage() {
             </div>
           </div>
 
-          {fetchedAt && (
+          {/* {fetchedAt && (
             <div className="mt-3 text-[11px] text-neutral-500">
-              Group updated{" "}
+              Bracket Scores Last{" "}
               {new Date(fetchedAt).toLocaleTimeString([], {
                 hour: "numeric",
                 minute: "2-digit",
                 second: "2-digit",
               })}
             </div>
-          )}
+          )} */}
         </header>
 
         <section className="mb-4 rounded-2xl border border-neutral-800 bg-neutral-900 p-3 shadow-sm">
