@@ -1,5 +1,8 @@
 name: Update Bracket Data
 
+on:
+  workflow_dispatch:
+
 permissions:
   contents: write
 
