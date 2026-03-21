@@ -482,67 +482,142 @@ const hottestGain = pointGainsToday[hottestPlayer] ?? 0;
   })()}
 </section>
 
-        <section className="mt-4 mb-4 grid gap-3">
-          <div className="relative overflow-hidden rounded-2xl border border-yellow-400/60 bg-yellow-500/10 px-4 py-4 shadow-lg">
-            <div className="absolute inset-0 bg-yellow-400/10 blur-2xl" />
-            <div className="relative">
-              <div className="mb-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-yellow-300/80">
-                Current Winner
-              </div>
+        <section className="mt-4 mb-4 rounded-2xl border border-neutral-800 bg-neutral-900 p-3 shadow-sm sm:p-4">
+  <div className="mb-3 flex items-center justify-between">
+    <h2 className="text-base font-semibold text-white">Stats</h2>
+    <div className="text-xs text-neutral-500">live insights</div>
+  </div>
 
-              <div className="flex items-center justify-between gap-3">
-                <div className="flex min-w-0 items-center gap-3">
-                  <span className="text-3xl">👑</span>
-                  <div className="min-w-0">
-                    <div className="winner-banner-text truncate text-lg font-extrabold">
-                      {leader}
-                    </div>
-                    <div className="text-xs text-yellow-100/70">Ur tuff</div>
-                  </div>
-                </div>
+  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
 
-                <div className="shrink-0 rounded-xl border border-yellow-300/40 bg-yellow-300/10 px-3 py-2 text-right">
-                  <div className="winner-banner-text font-mono text-xl font-bold">
-                    {latestScores[leader]}
-                  </div>
-                  <div className="text-[10px] text-yellow-100/70">
-                    max {liveMaxPoints[leader]}
-                  </div>
-                </div>
-              </div>
-            </div>
+
+
+<div className="rounded-xl border border-orange-500/30 bg-orange-500/5 px-4 py-3">
+  <div className="mb-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-orange-300/80">
+    Hot Today
+  </div>
+
+{hottestGain > 0 ? (
+  <div className="flex items-center justify-between gap-3">
+    <div className="min-w-0">
+      <div className="truncate text-sm font-semibold text-orange-100">
+        {hottestPlayer}
+      </div>
+      <div className="text-xs text-orange-200/70">
+        gained {hottestGain} pt{hottestGain === 1 ? "" : "s"} today
+      </div>
+    </div>
+
+    <div className="shrink-0 rounded-xl bg-orange-400/10 px-3 py-2 font-mono text-lg font-bold text-orange-300">
+      +{hottestGain}
+    </div>
+  </div>
+) : (
+  <div className="text-xs text-neutral-400">No points gained yet today</div>
+)}
+</div>
+
+    <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 px-4 py-3">
+      <div className="mb-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-amber-300/80">
+        Biggest Choke Risk
+      </div>
+
+      <div className="flex items-center justify-between gap-3">
+        <div className="min-w-0">
+          <div className="truncate text-sm font-semibold text-amber-100">
+            {biggestChokeRisk}
+          </div>
+          <div className="text-xs text-amber-200/70">
+            only {remainingPoints[biggestChokeRisk]} pts of upside left
+          </div>
+        </div>
+
+        <div className="shrink-0 rounded-xl bg-amber-400/10 px-3 py-2 text-lg font-bold text-amber-300">
+          ⚠️
+        </div>
+      </div>
+    </div>
+
+    <div className="rounded-xl border border-cyan-500/30 bg-cyan-500/5 px-4 py-3">
+      <div className="mb-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-cyan-300/80">
+        Most Alive
+      </div>
+
+      <div className="flex items-center justify-between gap-3">
+        <div className="min-w-0">
+          <div className="truncate text-sm font-semibold text-cyan-100">
+            {mostAlive}
+          </div>
+          <div className="text-xs text-cyan-200/70">
+            {remainingPoints[mostAlive]} pts still in play
+          </div>
+        </div>
+
+        <div className="shrink-0 rounded-xl bg-cyan-400/10 px-3 py-2 text-lg font-bold text-cyan-300">
+          🔥
+        </div>
+      </div>
+    </div>
+
+    {(
+      <>
+        <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/5 px-4 py-3">
+          <div className="mb-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-emerald-300/80">
+            Biggest Jump Since Last Game
           </div>
 
-          <div className="relative overflow-hidden rounded-2xl border border-red-500/50 bg-red-500/10 px-4 py-4 shadow-lg">
-            <div className="absolute inset-0 bg-red-500/10 blur-2xl" />
-            <div className="relative">
-              <div className="mb-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-red-300/80">
-                Current Loser
+          {biggestClimbValue > 0 ? (
+            <div className="flex items-center justify-between gap-3">
+              <div className="min-w-0">
+                <div className="truncate text-sm font-semibold text-emerald-100">
+                  {biggestClimbPlayer}
+                </div>
+                <div className="text-xs text-emerald-200/70">
+                  climbed {biggestClimbValue} spot
+                  {biggestClimbValue === 1 ? "" : "s"}
+                </div>
               </div>
 
-              <div className="flex items-center justify-between gap-3">
-                <div className="flex min-w-0 items-center gap-3">
-                  <span className="text-3xl">💀</span>
-                  <div className="min-w-0">
-                    <div className="truncate text-lg font-bold text-red-200">
-                      {loser}
-                    </div>
-                    <div className="text-xs text-red-100/70">Ur bad</div>
-                  </div>
-                </div>
-
-                <div className="shrink-0 rounded-xl border border-red-300/30 bg-red-300/10 px-3 py-2 text-right">
-                  <div className="font-mono text-xl font-bold text-red-100">
-                    {latestScores[loser]}
-                  </div>
-                  <div className="text-[10px] text-red-100/60">
-                    max {liveMaxPoints[loser]}
-                  </div>
-                </div>
+              <div className="shrink-0 rounded-xl bg-emerald-400/10 px-3 py-2 font-mono text-lg font-bold text-emerald-300">
+                +{biggestClimbValue}
               </div>
             </div>
+          ) : (
+            <div className="text-xs text-neutral-400">No one moved up</div>
+          )}
+        </div>
+
+        <div className="rounded-xl border border-rose-500/30 bg-rose-500/5 px-4 py-3">
+          <div className="mb-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-rose-300/80">
+            Biggest Falloff Since Last Game
           </div>
-        </section>
+
+          {biggestFallValue < 0 ? (
+            <div className="flex items-center justify-between gap-3">
+              <div className="min-w-0">
+                <div className="truncate text-sm font-semibold text-rose-100">
+                  {biggestFallPlayer}
+                </div>
+                <div className="text-xs text-rose-200/70">
+                  dropped {Math.abs(biggestFallValue)} spot
+                  {Math.abs(biggestFallValue) === 1 ? "" : "s"}
+                </div>
+              </div>
+
+              <div className="shrink-0 rounded-xl bg-rose-400/10 px-3 py-2 font-mono text-lg font-bold text-rose-300">
+                {biggestFallValue}
+              </div>
+            </div>
+          ) : (
+            <div className="text-xs text-neutral-400">No one moved down</div>
+          )}
+        </div>
+      </>
+    )}
+  </div>
+</section>
+
+
 
 <section className="rounded-2xl border border-neutral-800 bg-neutral-900 p-3 shadow-sm sm:p-4">
   <div className="mb-3 flex items-center justify-between">
@@ -672,6 +747,70 @@ const hottestGain = pointGainsToday[hottestPlayer] ?? 0;
   </div>
 </section>
 
+
+        <section className="mt-4 mb-4 grid gap-3">
+          <div className="relative overflow-hidden rounded-2xl border border-yellow-400/60 bg-yellow-500/10 px-4 py-4 shadow-lg">
+            <div className="absolute inset-0 bg-yellow-400/10 blur-2xl" />
+            <div className="relative">
+              <div className="mb-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-yellow-300/80">
+                Current Winner
+              </div>
+
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex min-w-0 items-center gap-3">
+                  <span className="text-3xl">👑</span>
+                  <div className="min-w-0">
+                    <div className="winner-banner-text truncate text-lg font-extrabold">
+                      {leader}
+                    </div>
+                    <div className="text-xs text-yellow-100/70">Ur tuff</div>
+                  </div>
+                </div>
+
+                <div className="shrink-0 rounded-xl border border-yellow-300/40 bg-yellow-300/10 px-3 py-2 text-right">
+                  <div className="winner-banner-text font-mono text-xl font-bold">
+                    {latestScores[leader]}
+                  </div>
+                  <div className="text-[10px] text-yellow-100/70">
+                    max {liveMaxPoints[leader]}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="relative overflow-hidden rounded-2xl border border-red-500/50 bg-red-500/10 px-4 py-4 shadow-lg">
+            <div className="absolute inset-0 bg-red-500/10 blur-2xl" />
+            <div className="relative">
+              <div className="mb-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-red-300/80">
+                Current Loser
+              </div>
+
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex min-w-0 items-center gap-3">
+                  <span className="text-3xl">💀</span>
+                  <div className="min-w-0">
+                    <div className="truncate text-lg font-bold text-red-200">
+                      {loser}
+                    </div>
+                    <div className="text-xs text-red-100/70">Ur bad</div>
+                  </div>
+                </div>
+
+                <div className="shrink-0 rounded-xl border border-red-300/30 bg-red-300/10 px-3 py-2 text-right">
+                  <div className="font-mono text-xl font-bold text-red-100">
+                    {latestScores[loser]}
+                  </div>
+                  <div className="text-[10px] text-red-100/60">
+                    max {liveMaxPoints[loser]}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+
         <section className="mt-4 rounded-2xl border border-neutral-800 bg-neutral-900 p-3 shadow-sm sm:p-4">
           <div className="mb-3 flex items-center justify-between">
             <h2 className="text-base font-semibold text-white">Brackets</h2>
@@ -749,139 +888,6 @@ const hottestGain = pointGainsToday[hottestPlayer] ?? 0;
             ))}
           </div>
         </section>
-
-        <section className="mt-4 mb-4 rounded-2xl border border-neutral-800 bg-neutral-900 p-3 shadow-sm sm:p-4">
-  <div className="mb-3 flex items-center justify-between">
-    <h2 className="text-base font-semibold text-white">Stats</h2>
-    <div className="text-xs text-neutral-500">live insights</div>
-  </div>
-
-  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-
-<div className="rounded-xl border border-orange-500/30 bg-orange-500/5 px-4 py-3">
-  <div className="mb-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-orange-300/80">
-    Hot Today
-  </div>
-
-{hottestGain > 0 ? (
-  <div className="flex items-center justify-between gap-3">
-    <div className="min-w-0">
-      <div className="truncate text-sm font-semibold text-orange-100">
-        {hottestPlayer}
-      </div>
-      <div className="text-xs text-orange-200/70">
-        gained {hottestGain} pt{hottestGain === 1 ? "" : "s"} today
-      </div>
-    </div>
-
-    <div className="shrink-0 rounded-xl bg-orange-400/10 px-3 py-2 font-mono text-lg font-bold text-orange-300">
-      +{hottestGain}
-    </div>
-  </div>
-) : (
-  <div className="text-xs text-neutral-400">No points gained yet today</div>
-)}
-</div>
-
-    <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 px-4 py-3">
-      <div className="mb-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-amber-300/80">
-        Biggest Choke Risk
-      </div>
-
-      <div className="flex items-center justify-between gap-3">
-        <div className="min-w-0">
-          <div className="truncate text-sm font-semibold text-amber-100">
-            {biggestChokeRisk}
-          </div>
-          <div className="text-xs text-amber-200/70">
-            only {remainingPoints[biggestChokeRisk]} pts of upside left
-          </div>
-        </div>
-
-        <div className="shrink-0 rounded-xl bg-amber-400/10 px-3 py-2 text-lg font-bold text-amber-300">
-          ⚠️
-        </div>
-      </div>
-    </div>
-
-    <div className="rounded-xl border border-cyan-500/30 bg-cyan-500/5 px-4 py-3">
-      <div className="mb-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-cyan-300/80">
-        Most Alive
-      </div>
-
-      <div className="flex items-center justify-between gap-3">
-        <div className="min-w-0">
-          <div className="truncate text-sm font-semibold text-cyan-100">
-            {mostAlive}
-          </div>
-          <div className="text-xs text-cyan-200/70">
-            {remainingPoints[mostAlive]} pts still in play
-          </div>
-        </div>
-
-        <div className="shrink-0 rounded-xl bg-cyan-400/10 px-3 py-2 text-lg font-bold text-cyan-300">
-          🔥
-        </div>
-      </div>
-    </div>
-
-    {(
-      <>
-        <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/5 px-4 py-3">
-          <div className="mb-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-emerald-300/80">
-            Biggest Jump Since Last Game
-          </div>
-
-          {biggestClimbValue > 0 ? (
-            <div className="flex items-center justify-between gap-3">
-              <div className="min-w-0">
-                <div className="truncate text-sm font-semibold text-emerald-100">
-                  {biggestClimbPlayer}
-                </div>
-                <div className="text-xs text-emerald-200/70">
-                  climbed {biggestClimbValue} spot
-                  {biggestClimbValue === 1 ? "" : "s"}
-                </div>
-              </div>
-
-              <div className="shrink-0 rounded-xl bg-emerald-400/10 px-3 py-2 font-mono text-lg font-bold text-emerald-300">
-                +{biggestClimbValue}
-              </div>
-            </div>
-          ) : (
-            <div className="text-xs text-neutral-400">No one moved up</div>
-          )}
-        </div>
-
-        <div className="rounded-xl border border-rose-500/30 bg-rose-500/5 px-4 py-3">
-          <div className="mb-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-rose-300/80">
-            Biggest Falloff Since Last Game
-          </div>
-
-          {biggestFallValue < 0 ? (
-            <div className="flex items-center justify-between gap-3">
-              <div className="min-w-0">
-                <div className="truncate text-sm font-semibold text-rose-100">
-                  {biggestFallPlayer}
-                </div>
-                <div className="text-xs text-rose-200/70">
-                  dropped {Math.abs(biggestFallValue)} spot
-                  {Math.abs(biggestFallValue) === 1 ? "" : "s"}
-                </div>
-              </div>
-
-              <div className="shrink-0 rounded-xl bg-rose-400/10 px-3 py-2 font-mono text-lg font-bold text-rose-300">
-                {biggestFallValue}
-              </div>
-            </div>
-          ) : (
-            <div className="text-xs text-neutral-400">No one moved down</div>
-          )}
-        </div>
-      </>
-    )}
-  </div>
-</section>
       </div>
     </main>
   );
