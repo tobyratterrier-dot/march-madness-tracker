@@ -197,6 +197,47 @@ export default function HomePage() {
     return result;
   }, [latestScores, liveMaxPoints]);
 
+// =========================
+// HOT TODAY (same-day gain)
+// =========================
+const pointGainsToday = useMemo(() => {
+  const gains = {} as Record<Player, number>;
+  players.forEach((player) => {
+    gains[player] = 0;
+  });
+
+  // Only keep rows that have at least one real score
+  const scoredRows = chartData.filter((row) =>
+    players.some((player) => typeof row[player] === "number")
+  );
+
+  if (scoredRows.length < 2) return gains;
+
+  const todayRow = scoredRows[scoredRows.length - 1];
+  const previousRow = scoredRows[scoredRows.length - 2];
+
+  players.forEach((player) => {
+    const todayValue =
+      typeof todayRow[player] === "number" ? (todayRow[player] as number) : 0;
+    const previousValue =
+      typeof previousRow[player] === "number"
+        ? (previousRow[player] as number)
+        : 0;
+
+    gains[player] = todayValue - previousValue;
+  });
+
+  return gains;
+}, [chartData]);
+
+const hottestPlayer = useMemo(() => {
+  return [...players].sort(
+    (a, b) => pointGainsToday[b] - pointGainsToday[a]
+  )[0];
+}, [pointGainsToday]);
+
+const hottestGain = pointGainsToday[hottestPlayer] ?? 0;
+
   // ---------------------------
   // Insights
   // Biggest choke risk = top half with lowest remaining upside
@@ -590,6 +631,32 @@ export default function HomePage() {
   </div>
 
   <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+
+<div className="rounded-xl border border-orange-500/30 bg-orange-500/5 px-4 py-3">
+  <div className="mb-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-orange-300/80">
+    Hot Today
+  </div>
+
+{hottestGain > 0 ? (
+  <div className="flex items-center justify-between gap-3">
+    <div className="min-w-0">
+      <div className="truncate text-sm font-semibold text-orange-100">
+        {hottestPlayer}
+      </div>
+      <div className="text-xs text-orange-200/70">
+        gained {hottestGain} pt{hottestGain === 1 ? "" : "s"} today
+      </div>
+    </div>
+
+    <div className="shrink-0 rounded-xl bg-orange-400/10 px-3 py-2 font-mono text-lg font-bold text-orange-300">
+      +{hottestGain}
+    </div>
+  </div>
+) : (
+  <div className="text-xs text-neutral-400">No points gained yet today</div>
+)}
+</div>
+
     <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 px-4 py-3">
       <div className="mb-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-amber-300/80">
         Biggest Choke Risk
@@ -636,7 +703,7 @@ export default function HomePage() {
       <>
         <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/5 px-4 py-3">
           <div className="mb-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-emerald-300/80">
-            Biggest Jump
+            Biggest Jump Since Last Game
           </div>
 
           {biggestClimbValue > 0 ? (
@@ -662,7 +729,7 @@ export default function HomePage() {
 
         <div className="rounded-xl border border-rose-500/30 bg-rose-500/5 px-4 py-3">
           <div className="mb-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-rose-300/80">
-            Biggest Falloff
+            Biggest Falloff Since Last Game
           </div>
 
           {biggestFallValue < 0 ? (
