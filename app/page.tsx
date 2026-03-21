@@ -158,6 +158,70 @@ export default function HomePage() {
   const leader = sortedPlayers[0];
   const loser = sortedPlayers[sortedPlayers.length - 1];
 
+  const getSortedPlayersForRow = (row: HistoryRow) => {
+  const scores: Record<string, number> = {};
+  const maxes: Record<string, number> = {};
+
+  players.forEach((player) => {
+    const value = row[player as keyof typeof row];
+    scores[player] = typeof value === "number" ? value : 0;
+    maxes[player] = liveMaxPoints[player] ?? 0;
+  });
+
+  return [...players].sort((a, b) => {
+    const scoreDiff = scores[b] - scores[a];
+    if (scoreDiff !== 0) return scoreDiff;
+
+    const maxDiff = maxes[b] - maxes[a];
+    if (maxDiff !== 0) return maxDiff;
+
+    return a.localeCompare(b);
+  });
+};
+
+const scoredHistoryRows = chartData.filter((row) =>
+  players.some((player) => typeof row[player as keyof typeof row] === "number")
+);
+
+const latestHistoryRow =
+  scoredHistoryRows.length > 0 ? scoredHistoryRows[scoredHistoryRows.length - 1] : null;
+
+const previousHistoryRow =
+  scoredHistoryRows.length > 1 ? scoredHistoryRows[scoredHistoryRows.length - 2] : null;
+
+const currentRanks: Record<string, number> = {};
+const previousRanks: Record<string, number> = {};
+const rankChanges: Record<string, number> = {};
+
+if (latestHistoryRow) {
+  getSortedPlayersForRow(latestHistoryRow).forEach((player, index) => {
+    currentRanks[player] = index + 1;
+  });
+}
+
+if (previousHistoryRow) {
+  getSortedPlayersForRow(previousHistoryRow).forEach((player, index) => {
+    previousRanks[player] = index + 1;
+  });
+}
+
+players.forEach((player) => {
+  const currentRank = currentRanks[player] ?? players.length;
+  const prevRank = previousRanks[player] ?? currentRank;
+  rankChanges[player] = prevRank - currentRank;
+});
+
+const biggestClimbPlayer = [...players].sort(
+  (a, b) => rankChanges[b] - rankChanges[a]
+)[0];
+
+const biggestFallPlayer = [...players].sort(
+  (a, b) => rankChanges[a] - rankChanges[b]
+)[0];
+
+const biggestClimbValue = rankChanges[biggestClimbPlayer] ?? 0;
+const biggestFallValue = rankChanges[biggestFallPlayer] ?? 0;
+
   return (
     <main className="min-h-screen bg-neutral-950 text-neutral-100">
       <div className="mx-auto max-w-5xl px-3 py-3 sm:px-6 sm:py-6">
@@ -416,6 +480,8 @@ export default function HomePage() {
                 Current Winner
               </div>
 
+              
+
               <div className="flex items-center justify-between gap-3">
                 <div className="flex min-w-0 items-center gap-3">
                   <span className="text-3xl">👑</span>
@@ -470,66 +536,140 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section className="mt-4 rounded-2xl border border-neutral-800 bg-neutral-900 p-3 shadow-sm sm:p-4">
-          <div className="mb-3 flex items-center justify-between">
-            <h2 className="text-base font-semibold text-white">Brackets</h2>
-            <div className="text-xs text-neutral-500">score • max</div>
+<section className="mb-4 grid grid-cols-2 gap-3">
+  <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/5 p-4">
+    <div className="mb-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-emerald-300/80">
+      Biggest Jump Since last game
+    </div>
+
+    {biggestClimbValue > 0 ? (
+      <div className="flex items-center justify-between gap-3">
+        <div className="min-w-0">
+          <div className="truncate text-sm font-semibold text-emerald-100">
+            {biggestClimbPlayer}
+          </div>
+          <div className="text-xs text-emerald-200/70">
+            climbed {biggestClimbValue} spot{biggestClimbValue === 1 ? "" : "s"}
+          </div>
+        </div>
+
+        <div className="shrink-0 rounded-xl bg-emerald-400/10 px-3 py-2 font-mono text-lg font-bold text-emerald-300">
+          +{biggestClimbValue}
+        </div>
+      </div>
+    ) : (
+      <div className="text-xs text-neutral-400">No upward movement yet</div>
+    )}
+  </div>
+
+  <div className="rounded-2xl border border-rose-500/30 bg-rose-500/5 p-4">
+    <div className="mb-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-rose-300/80">
+      Biggest Falloff Since Last Game
+    </div>
+
+    {biggestFallValue < 0 ? (
+      <div className="flex items-center justify-between gap-3">
+        <div className="min-w-0">
+          <div className="truncate text-sm font-semibold text-rose-100">
+            {biggestFallPlayer}
+          </div>
+          <div className="text-xs text-rose-200/70">
+            dropped {Math.abs(biggestFallValue)} spot
+            {Math.abs(biggestFallValue) === 1 ? "" : "s"}
+          </div>
+        </div>
+
+        <div className="shrink-0 rounded-xl bg-rose-400/10 px-3 py-2 font-mono text-lg font-bold text-rose-300">
+          {biggestFallValue}
+        </div>
+      </div>
+    ) : (
+      <div className="text-xs text-neutral-400">No downward movement yet</div>
+    )}
+  </div>
+</section>
+
+<section className="mt-4 rounded-2xl border border-neutral-800 bg-neutral-900 p-3 shadow-sm sm:p-4">
+  <div className="mb-3 flex items-center justify-between">
+    <h2 className="text-base font-semibold text-white">Brackets</h2>
+    <div className="text-xs text-neutral-500">score • max</div>
+  </div>
+
+  <div className="space-y-2">
+    {sortedPlayers.map((player: string, index) => (
+      <div
+        key={player}
+        className={`rounded-xl border px-3 py-3 ${
+          player === leader
+            ? "border-yellow-400/40 bg-yellow-500/5"
+            : player === loser
+            ? "border-red-500/30 bg-red-500/5"
+            : "border-neutral-800 bg-neutral-950/40"
+        }`}
+      >
+        <div className="flex items-center gap-3">
+          <div className="w-6 shrink-0 text-sm font-semibold text-neutral-500">
+            #{index + 1}
           </div>
 
-          <div className="space-y-2">
-            {sortedPlayers.map((player: string, index) => (
-              <div
-                key={player}
-                className={`rounded-xl border px-3 py-3 ${
-                  player === leader
-                    ? "border-yellow-400/40 bg-yellow-500/5"
-                    : player === loser
-                      ? "border-red-500/30 bg-red-500/5"
-                      : "border-neutral-800 bg-neutral-950/40"
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-6 shrink-0 text-sm font-semibold text-neutral-500">
-                    #{index + 1}
-                  </div>
+          <span
+            className="h-3 w-3 shrink-0 rounded-full"
+            style={{ backgroundColor: playerColors[player] }}
+          />
 
-                  <span
-                    className="h-3 w-3 shrink-0 rounded-full"
-                    style={{ backgroundColor: playerColors[player] }}
-                  />
+          <div className="min-w-0 flex-1">
+            {/* Top row */}
+            <div className="flex items-center justify-between gap-3">
+              <span className="truncate text-sm font-medium text-neutral-100">
+                {player}
+              </span>
 
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center justify-between gap-3">
-                      <span className="truncate text-sm font-medium text-neutral-100">
-                        {player}
-                      </span>
-                      <div className="shrink-0 text-right font-mono">
-                        <div className="text-sm text-neutral-100">
-                          {latestScores[player]}
-                        </div>
-                        <div className="text-[11px] text-neutral-500">
-                          max {liveMaxPoints[player]}
-                        </div>
-                      </div>
-                    </div>
-
-                    {player === leader && (
-                      <div className="mt-1 text-[11px] text-yellow-300/80">
-                        Leading on score + tiebreak
-                      </div>
-                    )}
-
-                    {player === loser && (
-                      <div className="mt-1 text-[11px] text-red-300/80">
-                        Dead last right now
-                      </div>
-                    )}
-                  </div>
+              <div className="shrink-0 text-right font-mono">
+                <div className="text-sm text-neutral-100">
+                  {latestScores[player]}
+                </div>
+                <div className="text-[11px] text-neutral-500">
+                  max {liveMaxPoints[player]}
                 </div>
               </div>
-            ))}
+            </div>
+
+            {/* Movement row */}
+            <div className="mt-1 flex items-center gap-2 text-[11px]">
+              {rankChanges[player] > 0 ? (
+                <span className="text-emerald-300">
+                  ↑ +{rankChanges[player]} spot
+                  {rankChanges[player] === 1 ? "" : "s"}
+                </span>
+              ) : rankChanges[player] < 0 ? (
+                <span className="text-rose-300">
+                  ↓ {Math.abs(rankChanges[player])} spot
+                  {Math.abs(rankChanges[player]) === 1 ? "" : "s"}
+                </span>
+              ) : (
+                <span className="text-neutral-500">
+                  No movement since last game
+                </span>
+              )}
+            </div>
+
+            {player === leader && (
+              <div className="mt-1 text-[11px] text-yellow-300/80">
+                Leading score with max tiebreak
+              </div>
+            )}
+
+            {player === loser && (
+              <div className="mt-1 text-[11px] text-red-300/80">
+                Dead last right now
+              </div>
+            )}
           </div>
-        </section>
+        </div>
+      </div>
+    ))}
+  </div>
+</section>
       </div>
     </main>
   );
