@@ -636,21 +636,21 @@ const biggestFallValue = rankChanges[biggestFallPlayer] ?? 0;
 
             {/* Movement row */}
             <div className="mt-1 flex items-center gap-2 text-[11px]">
-              {rankChanges[player] > 0 ? (
-                <span className="text-emerald-300">
-                  ↑ +{rankChanges[player]} spot
-                  {rankChanges[player] === 1 ? "" : "s"}
-                </span>
-              ) : rankChanges[player] < 0 ? (
-                <span className="text-rose-300">
-                  ↓ {Math.abs(rankChanges[player])} spot
-                  {Math.abs(rankChanges[player]) === 1 ? "" : "s"}
-                </span>
-              ) : (
-                <span className="text-neutral-500">
-                  No movement since last game
-                </span>
-              )}
+{rankChanges[player] !== 0 && (
+  <div className="mt-1 flex items-center gap-2 text-[11px]">
+    {rankChanges[player] > 0 ? (
+      <span className="text-emerald-300">
+        ↑ +{rankChanges[player]} spot
+        {rankChanges[player] === 1 ? "" : "s"}
+      </span>
+    ) : (
+      <span className="text-rose-300">
+        ↓ {Math.abs(rankChanges[player])} spot
+        {Math.abs(rankChanges[player]) === 1 ? "" : "s"}
+      </span>
+    )}
+  </div>
+)}
             </div>
 
             {player === leader && (
