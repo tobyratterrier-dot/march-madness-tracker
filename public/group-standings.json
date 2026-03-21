@@ -1,69 +1,69 @@
 {
-  "fetchedAt": "2026-03-21T01:12:41.063Z",
+  "fetchedAt": "2026-03-21T01:36:01.774Z",
   "standings": [
     {
       "rank": 1,
       "player": "Beverly Hillbilly",
-      "pts": 190,
-      "pct": 69,
+      "pts": 210,
+      "pct": 76.4,
       "max": 1860,
-      "r64": 190
+      "r64": 210
     },
     {
       "rank": 1,
       "player": "espnfan0099",
-      "pts": 190,
-      "pct": 87,
+      "pts": 210,
+      "pct": 76.4,
       "max": 1840,
-      "r64": 190
+      "r64": 210
     },
     {
       "rank": 1,
       "player": "will3burns Picks 1",
-      "pts": 190,
-      "pct": 69,
+      "pts": 210,
+      "pct": 76.4,
       "max": 1800,
-      "r64": 190
+      "r64": 210
     },
     {
       "rank": 1,
       "player": "Cant bet against the zags",
-      "pts": 190,
-      "pct": 69,
+      "pts": 210,
+      "pct": 76.4,
       "max": 1780,
-      "r64": 190
+      "r64": 210
     },
     {
       "rank": 5,
       "player": "PHILONPHILON",
-      "pts": 180,
-      "pct": 48,
+      "pts": 200,
+      "pct": 56.4,
       "max": 1850,
-      "r64": 180
+      "r64": 200
     },
     {
       "rank": 5,
       "player": "G Goff",
-      "pts": 180,
-      "pct": 48,
+      "pts": 200,
+      "pct": 56.4,
       "max": 1750,
-      "r64": 180
+      "r64": 200
     },
     {
       "rank": 7,
       "player": "Acuff 1.01",
-      "pts": 170,
-      "pct": 27.1,
+      "pts": 190,
+      "pct": 36.8,
       "max": 1840,
-      "r64": 170
+      "r64": 190
     },
     {
-      "rank": 7,
+      "rank": 8,
       "player": "Slobonmyhawgggg",
-      "pts": 170,
-      "pct": 27.1,
-      "max": 1780,
-      "r64": 170
+      "pts": 180,
+      "pct": 36.8,
+      "max": 1750,
+      "r64": 180
     }
   ]
 }
