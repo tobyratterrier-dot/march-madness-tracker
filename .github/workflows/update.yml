@@ -1,10 +1,5 @@
 name: Update Bracket Data
 
-on:
-  workflow_dispatch:
-  schedule:
-    - cron: "*/5 * * * *"
-
 permissions:
   contents: write
 
