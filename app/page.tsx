@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   LineChart,
   Line,
@@ -11,6 +11,8 @@ import {
   ReferenceLine,
 } from "recharts";
 import { players, days, playerColors, roundLabels } from "./data/standings";
+
+type Player = (typeof players)[number];
 
 type GroupStanding = {
   rank: number;
@@ -36,102 +38,47 @@ type HistoryRow = {
   [key: string]: string | number | null;
 };
 
-export default function HomePage() {
-  const [games, setGames] = useState<LiveGame[]>([]);
-  const [groupStandings, setGroupStandings] = useState<GroupStanding[]>([]);
-  const [chartData, setChartData] = useState<HistoryRow[]>([]);
-  const [fetchedAt, setFetchedAt] = useState("");
+/**
+ * Safely fetch JSON from a URL.
+ * Returns null on any failure instead of throwing.
+ */
+async function fetchJson<T>(url: string): Promise<T | null> {
+  try {
+    const res = await fetch(url, { cache: "no-store" });
+    if (!res.ok) return null;
+    return (await res.json()) as T;
+  } catch {
+    return null;
+  }
+}
 
-  useEffect(() => {
-    const fetchGames = async () => {
-      try {
-        const res = await fetch("/api/live-games");
-        if (!res.ok) return;
+/**
+ * Sort players by:
+ * 1. score descending
+ * 2. max possible descending
+ * 3. name ascending
+ */
+function sortPlayersByScore(
+  scoreMap: Record<Player, number>,
+  maxMap: Record<Player, number>
+): Player[] {
+  return [...players].sort((a, b) => {
+    const scoreDiff = scoreMap[b] - scoreMap[a];
+    if (scoreDiff !== 0) return scoreDiff;
 
-        const data = await res.json();
-        if (Array.isArray(data)) {
-          setGames(data);
-        } else {
-          setGames([]);
-        }
-      } catch {
-        setGames([]);
-      }
-    };
+    const maxDiff = maxMap[b] - maxMap[a];
+    if (maxDiff !== 0) return maxDiff;
 
-    fetchGames();
-    const interval = setInterval(fetchGames, 5000);
+    return a.localeCompare(b);
+  });
+}
 
-    return () => clearInterval(interval);
-  }, []);
-
-  useEffect(() => {
-    const fetchGroupStandings = async () => {
-      try {
-        const res = await fetch(`/group-standings.json?t=${Date.now()}`, {
-          cache: "no-store",
-        });
-        if (!res.ok) return;
-
-        const data = await res.json();
-        if (Array.isArray(data?.standings)) {
-          setGroupStandings(data.standings);
-          setFetchedAt(data.fetchedAt ?? "");
-        } else {
-          setGroupStandings([]);
-          setFetchedAt("");
-        }
-      } catch {
-        setGroupStandings([]);
-        setFetchedAt("");
-      }
-    };
-
-    fetchGroupStandings();
-    const interval = setInterval(fetchGroupStandings, 5000);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  useEffect(() => {
-    const fetchHistory = async () => {
-      try {
-        const res = await fetch(`/history.json?t=${Date.now()}`, {
-          cache: "no-store",
-        });
-        if (!res.ok) return;
-
-        const data = await res.json();
-        if (Array.isArray(data)) {
-          setChartData(data);
-        } else {
-          setChartData([]);
-        }
-      } catch {
-        setChartData([]);
-      }
-    };
-
-    fetchHistory();
-    const interval = setInterval(fetchHistory, 5000);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  const maxScore = Math.max(
-    0,
-    ...chartData.flatMap((row) =>
-      players.map((player) => {
-        const value = row[player as keyof typeof row];
-        return typeof value === "number" ? value : 0;
-      })
-    )
-  );
-
-  const yMax = Math.min(maxScore + 100, 1920);
-
-  const latestScores: Record<string, number> = {};
-  const liveMaxPoints: Record<string, number> = {};
+/**
+ * Build score maps from live scraped standings.
+ */
+function buildLiveMaps(groupStandings: GroupStanding[]) {
+  const latestScores = {} as Record<Player, number>;
+  const liveMaxPoints = {} as Record<Player, number>;
 
   players.forEach((player) => {
     latestScores[player] = 0;
@@ -139,88 +86,201 @@ export default function HomePage() {
   });
 
   groupStandings.forEach((row) => {
-    if (row.player in latestScores) {
-      latestScores[row.player] = row.pts ?? 0;
-      liveMaxPoints[row.player] = row.max ?? 0;
+    if (players.includes(row.player as Player)) {
+      const player = row.player as Player;
+      latestScores[player] = row.pts ?? 0;
+      liveMaxPoints[player] = row.max ?? 0;
     }
   });
 
-  const sortedPlayers = [...players].sort((a, b) => {
-    const scoreDiff = latestScores[b] - latestScores[a];
-    if (scoreDiff !== 0) return scoreDiff;
+  return { latestScores, liveMaxPoints };
+}
 
-    const maxDiff = liveMaxPoints[b] - liveMaxPoints[a];
-    if (maxDiff !== 0) return maxDiff;
+/**
+ * Sort players for one historical row.
+ * Uses only that row's scores.
+ */
+function getSortedPlayersForHistoryRow(row: HistoryRow): Player[] {
+  const scores = {} as Record<Player, number>;
 
-    return a.localeCompare(b);
+  players.forEach((player) => {
+    const value = row[player];
+    scores[player] = typeof value === "number" ? value : 0;
   });
+
+  return [...players].sort((a, b) => scores[b] - scores[a]);
+}
+
+export default function HomePage() {
+  const [games, setGames] = useState<LiveGame[]>([]);
+  const [groupStandings, setGroupStandings] = useState<GroupStanding[]>([]);
+  const [chartData, setChartData] = useState<HistoryRow[]>([]);
+
+  // ---------------------------
+  // Live games polling
+  // ---------------------------
+  useEffect(() => {
+    const loadGames = async () => {
+      const data = await fetchJson<LiveGame[]>("/api/live-games");
+      setGames(Array.isArray(data) ? data : []);
+    };
+
+    loadGames();
+    const interval = setInterval(loadGames, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // ---------------------------
+  // Live bracket standings polling
+  // ---------------------------
+  useEffect(() => {
+    const loadStandings = async () => {
+      const data = await fetchJson<{ standings?: GroupStanding[] }>(
+        `/group-standings.json?t=${Date.now()}`
+      );
+
+      if (Array.isArray(data?.standings)) {
+        setGroupStandings(data.standings);
+      } else {
+        setGroupStandings([]);
+      }
+    };
+
+    loadStandings();
+    const interval = setInterval(loadStandings, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // ---------------------------
+  // Chart history polling
+  // ---------------------------
+  useEffect(() => {
+    const loadHistory = async () => {
+      const data = await fetchJson<HistoryRow[]>(`/history.json?t=${Date.now()}`);
+      setChartData(Array.isArray(data) ? data : []);
+    };
+
+    loadHistory();
+    const interval = setInterval(loadHistory, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // ---------------------------
+  // Derived live score maps
+  // ---------------------------
+  const { latestScores, liveMaxPoints } = useMemo(
+    () => buildLiveMaps(groupStandings),
+    [groupStandings]
+  );
+
+  // ---------------------------
+  // Main leaderboard ordering
+  // ---------------------------
+  const sortedPlayers = useMemo(
+    () => sortPlayersByScore(latestScores, liveMaxPoints),
+    [latestScores, liveMaxPoints]
+  );
 
   const leader = sortedPlayers[0];
   const loser = sortedPlayers[sortedPlayers.length - 1];
 
-  const getSortedPlayersForRow = (row: HistoryRow) => {
-  const scores: Record<string, number> = {};
-  const maxes: Record<string, number> = {};
+  // ---------------------------
+  // Remaining possible points
+  // ---------------------------
+  const remainingPoints = useMemo(() => {
+    const result = {} as Record<Player, number>;
 
-  players.forEach((player) => {
-    const value = row[player as keyof typeof row];
-    scores[player] = typeof value === "number" ? value : 0;
-    maxes[player] = liveMaxPoints[player] ?? 0;
-  });
+    players.forEach((player) => {
+      result[player] = Math.max(0, liveMaxPoints[player] - latestScores[player]);
+    });
 
-  return [...players].sort((a, b) => {
-    const scoreDiff = scores[b] - scores[a];
-    if (scoreDiff !== 0) return scoreDiff;
+    return result;
+  }, [latestScores, liveMaxPoints]);
 
-    const maxDiff = maxes[b] - maxes[a];
-    if (maxDiff !== 0) return maxDiff;
+  // ---------------------------
+  // Insights
+  // Biggest choke risk = top half with lowest remaining upside
+  // Most alive = non-leader with highest remaining upside
+  // ---------------------------
+  const contenders = useMemo(
+    () => sortedPlayers.slice(0, Math.max(1, Math.ceil(players.length / 2))),
+    [sortedPlayers]
+  );
 
-    return a.localeCompare(b);
-  });
-};
+  const biggestChokeRisk = useMemo(() => {
+    return [...contenders].sort(
+      (a, b) => remainingPoints[a] - remainingPoints[b]
+    )[0];
+  }, [contenders, remainingPoints]);
 
-const scoredHistoryRows = chartData.filter((row) =>
-  players.some((player) => typeof row[player as keyof typeof row] === "number")
-);
+  const mostAlive = useMemo(() => {
+    return [...sortedPlayers]
+      .filter((player) => player !== leader)
+      .sort((a, b) => remainingPoints[b] - remainingPoints[a])[0];
+  }, [sortedPlayers, remainingPoints, leader]);
 
-const latestHistoryRow =
-  scoredHistoryRows.length > 0 ? scoredHistoryRows[scoredHistoryRows.length - 1] : null;
+  // ---------------------------
+  // Rank movement from chart history
+  // Compares latest scored row to previous scored row
+  // ---------------------------
+  const rankChanges = useMemo(() => {
+    const changes = {} as Record<Player, number>;
+    players.forEach((player) => {
+      changes[player] = 0;
+    });
 
-const previousHistoryRow =
-  scoredHistoryRows.length > 1 ? scoredHistoryRows[scoredHistoryRows.length - 2] : null;
+    const scoredRows = chartData.filter((row) =>
+      players.some((player) => typeof row[player] === "number")
+    );
 
-const currentRanks: Record<string, number> = {};
-const previousRanks: Record<string, number> = {};
-const rankChanges: Record<string, number> = {};
+    const latestRow = scoredRows.at(-1);
+    const previousRow = scoredRows.at(-2);
 
-if (latestHistoryRow) {
-  getSortedPlayersForRow(latestHistoryRow).forEach((player, index) => {
-    currentRanks[player] = index + 1;
-  });
-}
+    if (!latestRow || !previousRow) return changes;
 
-if (previousHistoryRow) {
-  getSortedPlayersForRow(previousHistoryRow).forEach((player, index) => {
-    previousRanks[player] = index + 1;
-  });
-}
+    const currentOrder = getSortedPlayersForHistoryRow(latestRow);
+    const previousOrder = getSortedPlayersForHistoryRow(previousRow);
 
-players.forEach((player) => {
-  const currentRank = currentRanks[player] ?? players.length;
-  const prevRank = previousRanks[player] ?? currentRank;
-  rankChanges[player] = prevRank - currentRank;
-});
+    players.forEach((player) => {
+      const currentRank = currentOrder.indexOf(player);
+      const previousRank = previousOrder.indexOf(player);
+      changes[player] = previousRank - currentRank;
+    });
 
-const biggestClimbPlayer = [...players].sort(
-  (a, b) => rankChanges[b] - rankChanges[a]
-)[0];
+    return changes;
+  }, [chartData]);
 
-const biggestFallPlayer = [...players].sort(
-  (a, b) => rankChanges[a] - rankChanges[b]
-)[0];
+  const biggestClimbPlayer = useMemo(() => {
+    return [...players].sort(
+      (a, b) => (rankChanges[b] ?? 0) - (rankChanges[a] ?? 0)
+    )[0];
+  }, [rankChanges]);
 
-const biggestClimbValue = rankChanges[biggestClimbPlayer] ?? 0;
-const biggestFallValue = rankChanges[biggestFallPlayer] ?? 0;
+  const biggestFallPlayer = useMemo(() => {
+    return [...players].sort(
+      (a, b) => (rankChanges[a] ?? 0) - (rankChanges[b] ?? 0)
+    )[0];
+  }, [rankChanges]);
+
+  const biggestClimbValue = rankChanges[biggestClimbPlayer] ?? 0;
+  const biggestFallValue = rankChanges[biggestFallPlayer] ?? 0;
+
+  // ---------------------------
+  // Chart scaling
+  // ---------------------------
+  const maxScore = useMemo(() => {
+    return Math.max(
+      0,
+      ...chartData.flatMap((row) =>
+        players.map((player) => {
+          const value = row[player];
+          return typeof value === "number" ? value : 0;
+        })
+      )
+    );
+  }, [chartData]);
+
+  const yMax = Math.min(maxScore + 100, 1920);
 
   return (
     <main className="min-h-screen bg-neutral-950 text-neutral-100">
@@ -241,17 +301,6 @@ const biggestFallValue = rankChanges[biggestFallPlayer] ?? 0;
               Live
             </div>
           </div>
-
-          {/* {fetchedAt && (
-            <div className="mt-3 text-[11px] text-neutral-500">
-              Bracket Scores Last{" "}
-              {new Date(fetchedAt).toLocaleTimeString([], {
-                hour: "numeric",
-                minute: "2-digit",
-                second: "2-digit",
-              })}
-            </div>
-          )} */}
         </header>
 
         <section className="mb-4 rounded-2xl border border-neutral-800 bg-neutral-900 p-3 shadow-sm">
@@ -418,7 +467,7 @@ const biggestFallValue = rankChanges[biggestFallPlayer] ?? 0;
                     }
                   />
 
-                  {days.map((day: string) => (
+                  {days.map((day) => (
                     <ReferenceLine
                       key={day}
                       x={day}
@@ -426,14 +475,14 @@ const biggestFallValue = rankChanges[biggestFallPlayer] ?? 0;
                         day === "Apr 6"
                           ? "#fafafa"
                           : day === "Mar 18"
-                            ? "#71717a"
-                            : "#27272a"
+                          ? "#71717a"
+                          : "#27272a"
                       }
                       strokeWidth={day === "Apr 6" ? 2 : 1}
                     />
                   ))}
 
-                  {sortedPlayers.map((player: string) => (
+                  {sortedPlayers.map((player) => (
                     <Line
                       key={player}
                       type="monotone"
@@ -454,7 +503,7 @@ const biggestFallValue = rankChanges[biggestFallPlayer] ?? 0;
                             cx={props.cx}
                             cy={props.cy}
                             r={isNatty ? 6 : isLeader ? 4.5 : 3}
-                            fill={playerColors[props.dataKey]}
+                            fill={playerColors[props.dataKey as Player]}
                             stroke={isNatty ? "#fafafa" : "none"}
                             strokeWidth={isNatty ? 2 : 0}
                           />
@@ -479,8 +528,6 @@ const biggestFallValue = rankChanges[biggestFallPlayer] ?? 0;
               <div className="mb-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-yellow-300/80">
                 Current Winner
               </div>
-
-              
 
               <div className="flex items-center justify-between gap-3">
                 <div className="flex min-w-0 items-center gap-3">
@@ -536,140 +583,183 @@ const biggestFallValue = rankChanges[biggestFallPlayer] ?? 0;
           </div>
         </section>
 
-<section className="mb-4 grid grid-cols-2 gap-3">
-  <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/5 p-4">
-    <div className="mb-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-emerald-300/80">
-      Biggest Jump Since last game
-    </div>
+        <section className="mb-4 grid grid-cols-2 gap-3">
+          <div className="rounded-2xl border border-amber-500/30 bg-amber-500/5 p-4">
+            <div className="mb-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-amber-300/80">
+              Biggest Choke Risk
+            </div>
 
-    {biggestClimbValue > 0 ? (
-      <div className="flex items-center justify-between gap-3">
-        <div className="min-w-0">
-          <div className="truncate text-sm font-semibold text-emerald-100">
-            {biggestClimbPlayer}
-          </div>
-          <div className="text-xs text-emerald-200/70">
-            climbed {biggestClimbValue} spot{biggestClimbValue === 1 ? "" : "s"}
-          </div>
-        </div>
-
-        <div className="shrink-0 rounded-xl bg-emerald-400/10 px-3 py-2 font-mono text-lg font-bold text-emerald-300">
-          +{biggestClimbValue}
-        </div>
-      </div>
-    ) : (
-      <div className="text-xs text-neutral-400">No upward movement yet</div>
-    )}
-  </div>
-
-  <div className="rounded-2xl border border-rose-500/30 bg-rose-500/5 p-4">
-    <div className="mb-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-rose-300/80">
-      Biggest Falloff Since Last Game
-    </div>
-
-    {biggestFallValue < 0 ? (
-      <div className="flex items-center justify-between gap-3">
-        <div className="min-w-0">
-          <div className="truncate text-sm font-semibold text-rose-100">
-            {biggestFallPlayer}
-          </div>
-          <div className="text-xs text-rose-200/70">
-            dropped {Math.abs(biggestFallValue)} spot
-            {Math.abs(biggestFallValue) === 1 ? "" : "s"}
-          </div>
-        </div>
-
-        <div className="shrink-0 rounded-xl bg-rose-400/10 px-3 py-2 font-mono text-lg font-bold text-rose-300">
-          {biggestFallValue}
-        </div>
-      </div>
-    ) : (
-      <div className="text-xs text-neutral-400">No downward movement yet</div>
-    )}
-  </div>
-</section>
-
-<section className="mt-4 rounded-2xl border border-neutral-800 bg-neutral-900 p-3 shadow-sm sm:p-4">
-  <div className="mb-3 flex items-center justify-between">
-    <h2 className="text-base font-semibold text-white">Brackets</h2>
-    <div className="text-xs text-neutral-500">score • max</div>
-  </div>
-
-  <div className="space-y-2">
-    {sortedPlayers.map((player: string, index) => (
-      <div
-        key={player}
-        className={`rounded-xl border px-3 py-3 ${
-          player === leader
-            ? "border-yellow-400/40 bg-yellow-500/5"
-            : player === loser
-            ? "border-red-500/30 bg-red-500/5"
-            : "border-neutral-800 bg-neutral-950/40"
-        }`}
-      >
-        <div className="flex items-center gap-3">
-          <div className="w-6 shrink-0 text-sm font-semibold text-neutral-500">
-            #{index + 1}
-          </div>
-
-          <span
-            className="h-3 w-3 shrink-0 rounded-full"
-            style={{ backgroundColor: playerColors[player] }}
-          />
-
-          <div className="min-w-0 flex-1">
-            {/* Top row */}
             <div className="flex items-center justify-between gap-3">
-              <span className="truncate text-sm font-medium text-neutral-100">
-                {player}
-              </span>
-
-              <div className="shrink-0 text-right font-mono">
-                <div className="text-sm text-neutral-100">
-                  {latestScores[player]}
+              <div className="min-w-0">
+                <div className="truncate text-sm font-semibold text-amber-100">
+                  {biggestChokeRisk}
                 </div>
-                <div className="text-[11px] text-neutral-500">
-                  max {liveMaxPoints[player]}
+                <div className="text-xs text-amber-200/70">
+                  only {remainingPoints[biggestChokeRisk]} pts of upside left
                 </div>
               </div>
-            </div>
 
-            {/* Movement row */}
-            <div className="mt-1 flex items-center gap-2 text-[11px]">
-{rankChanges[player] !== 0 && (
-  <div className="mt-1 flex items-center gap-2 text-[11px]">
-    {rankChanges[player] > 0 ? (
-      <span className="text-emerald-300">
-        ↑ +{rankChanges[player]} spot
-        {rankChanges[player] === 1 ? "" : "s"}
-      </span>
-    ) : (
-      <span className="text-rose-300">
-        ↓ {Math.abs(rankChanges[player])} spot
-        {Math.abs(rankChanges[player]) === 1 ? "" : "s"}
-      </span>
-    )}
-  </div>
-)}
-            </div>
-
-            {player === leader && (
-              <div className="mt-1 text-[11px] text-yellow-300/80">
-                Leading score with max tiebreak
+              <div className="shrink-0 rounded-xl bg-amber-400/10 px-3 py-2 font-mono text-lg font-bold text-amber-300">
+                ⚠️
               </div>
+            </div>
+          </div>
+
+          <div className="rounded-2xl border border-cyan-500/30 bg-cyan-500/5 p-4">
+            <div className="mb-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-cyan-300/80">
+              Most Alive
+            </div>
+
+            <div className="flex items-center justify-between gap-3">
+              <div className="min-w-0">
+                <div className="truncate text-sm font-semibold text-cyan-100">
+                  {mostAlive}
+                </div>
+                <div className="text-xs text-cyan-200/70">
+                  {remainingPoints[mostAlive]} pts still in play
+                </div>
+              </div>
+
+              <div className="shrink-0 rounded-xl bg-cyan-400/10 px-3 py-2 font-mono text-lg font-bold text-cyan-300">
+                🔥
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="mb-4 grid grid-cols-2 gap-3">
+          <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/5 p-4">
+            <div className="mb-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-emerald-300/80">
+              Biggest Jump Since Last Game
+            </div>
+
+            {biggestClimbValue > 0 ? (
+              <div className="flex items-center justify-between gap-3">
+                <div className="min-w-0">
+                  <div className="truncate text-sm font-semibold text-emerald-100">
+                    {biggestClimbPlayer}
+                  </div>
+                  <div className="text-xs text-emerald-200/70">
+                    climbed {biggestClimbValue} spot
+                    {biggestClimbValue === 1 ? "" : "s"}
+                  </div>
+                </div>
+
+                <div className="shrink-0 rounded-xl bg-emerald-400/10 px-3 py-2 font-mono text-lg font-bold text-emerald-300">
+                  +{biggestClimbValue}
+                </div>
+              </div>
+            ) : (
+              <div className="text-xs text-neutral-400">No one moved up!</div>
             )}
+          </div>
 
-            {player === loser && (
-              <div className="mt-1 text-[11px] text-red-300/80">
-                Dead last right now
+          <div className="rounded-2xl border border-rose-500/30 bg-rose-500/5 p-4">
+            <div className="mb-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-rose-300/80">
+              Biggest Falloff Since Last Game
+            </div>
+
+            {biggestFallValue < 0 ? (
+              <div className="flex items-center justify-between gap-3">
+                <div className="min-w-0">
+                  <div className="truncate text-sm font-semibold text-rose-100">
+                    {biggestFallPlayer}
+                  </div>
+                  <div className="text-xs text-rose-200/70">
+                    dropped {Math.abs(biggestFallValue)} spot
+                    {Math.abs(biggestFallValue) === 1 ? "" : "s"}
+                  </div>
+                </div>
+
+                <div className="shrink-0 rounded-xl bg-rose-400/10 px-3 py-2 font-mono text-lg font-bold text-rose-300">
+                  {biggestFallValue}
+                </div>
+              </div>
+            ) : (
+              <div className="text-xs text-neutral-400">
+                No one moved down!
               </div>
             )}
           </div>
-        </div>
-      </div>
-    ))}
-  </div>
-</section>
+        </section>
+
+        <section className="mt-4 rounded-2xl border border-neutral-800 bg-neutral-900 p-3 shadow-sm sm:p-4">
+          <div className="mb-3 flex items-center justify-between">
+            <h2 className="text-base font-semibold text-white">Brackets</h2>
+            <div className="text-xs text-neutral-500">score • max</div>
+          </div>
+
+          <div className="space-y-2">
+            {sortedPlayers.map((player, index) => (
+              <div
+                key={player}
+                className={`rounded-xl border px-3 py-3 ${
+                  player === leader
+                    ? "border-yellow-400/40 bg-yellow-500/5"
+                    : player === loser
+                    ? "border-red-500/30 bg-red-500/5"
+                    : "border-neutral-800 bg-neutral-950/40"
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-6 shrink-0 text-sm font-semibold text-neutral-500">
+                    #{index + 1}
+                  </div>
+
+                  <span
+                    className="h-3 w-3 shrink-0 rounded-full"
+                    style={{ backgroundColor: playerColors[player] }}
+                  />
+
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="truncate text-sm font-medium text-neutral-100">
+                        {player}
+                      </span>
+
+                      <div className="shrink-0 text-right font-mono">
+                        <div className="text-sm text-neutral-100">
+                          {latestScores[player]}
+                        </div>
+                        <div className="text-[11px] text-neutral-500">
+                          max {liveMaxPoints[player]}
+                        </div>
+                      </div>
+                    </div>
+
+                    {rankChanges[player] !== 0 && (
+                      <div className="mt-1 flex items-center gap-2 text-[11px]">
+                        {rankChanges[player] > 0 ? (
+                          <span className="text-emerald-300">
+                            ↑ +{rankChanges[player]} spot
+                            {rankChanges[player] === 1 ? "" : "s"}
+                          </span>
+                        ) : (
+                          <span className="text-rose-300">
+                            ↓ {Math.abs(rankChanges[player])} spot
+                            {Math.abs(rankChanges[player]) === 1 ? "" : "s"}
+                          </span>
+                        )}
+                      </div>
+                    )}
+
+                    {player === leader && (
+                      <div className="mt-1 text-[11px] text-yellow-300/80">
+                        Leading score with max tiebreak
+                      </div>
+                    )}
+
+                    {player === loser && (
+                      <div className="mt-1 text-[11px] text-red-300/80">
+                        Dead last right now
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
       </div>
     </main>
   );
