@@ -360,66 +360,68 @@ const hottestGain = pointGainsToday[hottestPlayer] ?? 0;
     return (
       <div className="space-y-3">
         {/* LIVE GAMES */}
-        {liveGames.map((game) => {
-  const isClose =
-    !game.status.includes("1st") &&
-    Math.abs(game.homeScore - game.awayScore) <= 5;
+<div className="grid grid-cols-2 gap-2">
+  {liveGames.map((game) => {
+    const isClose =
+      !game.status.includes("1st") &&
+      Math.abs(game.homeScore - game.awayScore) <= 5;
 
-  return (
-    <div
-      key={game.id}
-      className={`relative overflow-hidden rounded-xl border p-3 transition-all ${
-        isClose
-          ? "border-yellow-400/40 bg-yellow-500/10 shadow-[0_0_18px_rgba(250,204,21,0.14)]"
-          : "border-neutral-800 bg-neutral-950/50"
-      }`}
-    >
-      {isClose && (
-        <div className="pointer-events-none absolute inset-0 rounded-xl bg-yellow-400/5 blur-xl" />
-      )}
+    return (
+      <div
+        key={game.id}
+        className={`relative min-w-0 overflow-hidden rounded-xl border p-3 transition-all ${
+          isClose
+            ? "border-yellow-400/40 bg-yellow-500/10 shadow-[0_0_18px_rgba(250,204,21,0.14)]"
+            : "border-neutral-800 bg-neutral-950/50"
+        }`}
+      >
+        {isClose && (
+          <div className="pointer-events-none absolute inset-0 rounded-xl bg-yellow-400/5 blur-xl" />
+        )}
 
-      <div className="relative">
-        {/* badges row */}
-        <div className="mb-1 flex items-center gap-2">
-          <span className="rounded-full bg-red-500/15 px-2 py-0.5 text-[10px] font-medium text-red-300">
-            LIVE
-          </span>
+        <div className="relative">
+          <div className="mb-2 flex items-center justify-between gap-2">
+            <div className="flex min-w-0 items-center gap-1.5">
+              <span className="whitespace-nowrap rounded-full bg-red-500/15 px-2 py-0.5 text-[10px] font-medium text-red-300">
+                LIVE
+              </span>
 
-          {isClose && (
-            <span className="rounded-full bg-yellow-400/15 px-2 py-0.5 text-[10px] font-medium text-yellow-300">
-              CLOSE
-            </span>
-          )}
-        </div>
+              {isClose && (
+                <span className="whitespace-nowrap rounded-full bg-yellow-400/15 px-2 py-0.5 text-[10px] font-medium text-yellow-300">
+                  CLOSE
+                </span>
+              )}
+            </div>
 
-        {/* always-visible time/status row */}
-        <div className="mb-2 text-[10px] leading-tight text-neutral-500">
-          {game.status}
-        </div>
-
-        <div className="space-y-1">
-          <div className="flex items-center justify-between gap-3">
-            <span className="truncate text-sm text-neutral-200">
-              {game.awayTeam}
-            </span>
-            <span className="font-mono text-base font-semibold text-white">
-              {game.awayScore}
+            <span className="shrink-0 whitespace-nowrap text-[10px] text-neutral-500">
+              {game.status}
             </span>
           </div>
 
-          <div className="flex items-center justify-between gap-3">
-            <span className="truncate text-sm text-neutral-200">
-              {game.homeTeam}
-            </span>
-            <span className="font-mono text-base font-semibold text-white">
-              {game.homeScore}
-            </span>
+          <div className="space-y-1">
+            <div className="flex items-center justify-between gap-3">
+              <span className="truncate text-sm text-neutral-200">
+                {game.awayTeam}
+              </span>
+              <span className="font-mono text-base font-semibold text-white">
+                {game.awayScore}
+              </span>
+            </div>
+
+            <div className="flex items-center justify-between gap-3">
+              <span className="truncate text-sm text-neutral-200">
+                {game.homeTeam}
+              </span>
+              <span className="font-mono text-base font-semibold text-white">
+                {game.homeScore}
+              </span>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  );
-})}
+    );
+  })}
+</div>
 
         {/* FINAL GAMES */}
         {finalGames.length > 0 && (
