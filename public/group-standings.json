@@ -1,69 +1,69 @@
 {
-  "fetchedAt": "2026-03-21T03:58:43.128Z",
+  "fetchedAt": "2026-03-21T04:55:05.672Z",
   "standings": [
     {
       "rank": 1,
-      "player": "Beverly Hillbilly",
-      "pts": 220,
-      "pct": 64.6,
-      "max": 1850,
-      "r64": 220
-    },
-    {
-      "rank": 1,
       "player": "espnfan0099",
-      "pts": 220,
-      "pct": 64.6,
+      "pts": 250,
+      "pct": 72.1,
       "max": 1830,
-      "r64": 220
-    },
-    {
-      "rank": 1,
-      "player": "will3burns Picks 1",
-      "pts": 220,
-      "pct": 64.6,
-      "max": 1790,
-      "r64": 220
+      "r64": 250
     },
     {
       "rank": 1,
       "player": "Cant bet against the zags",
-      "pts": 220,
-      "pct": 64.6,
+      "pts": 250,
+      "pct": 72.1,
       "max": 1770,
-      "r64": 220
+      "r64": 250
     },
     {
-      "rank": 1,
-      "player": "G Goff",
-      "pts": 220,
-      "pct": 64.6,
-      "max": 1750,
-      "r64": 220
-    },
-    {
-      "rank": 6,
-      "player": "Acuff 1.01",
-      "pts": 210,
-      "pct": 44.8,
+      "rank": 3,
+      "player": "Beverly Hillbilly",
+      "pts": 240,
+      "pct": 52.8,
       "max": 1840,
-      "r64": 210
+      "r64": 240
     },
     {
-      "rank": 6,
+      "rank": 3,
       "player": "PHILONPHILON",
-      "pts": 210,
-      "pct": 44.8,
+      "pts": 240,
+      "pct": 52.8,
       "max": 1840,
-      "r64": 210
+      "r64": 240
+    },
+    {
+      "rank": 3,
+      "player": "will3burns Picks 1",
+      "pts": 240,
+      "pct": 52.8,
+      "max": 1780,
+      "r64": 240
+    },
+    {
+      "rank": 3,
+      "player": "G Goff",
+      "pts": 240,
+      "pct": 52.8,
+      "max": 1740,
+      "r64": 240
+    },
+    {
+      "rank": 7,
+      "player": "Acuff 1.01",
+      "pts": 230,
+      "pct": 34.5,
+      "max": 1830,
+      "r64": 230
     },
     {
       "rank": 8,
       "player": "Slobonmyhawgggg",
-      "pts": 190,
-      "pct": 18.6,
-      "max": 1720,
-      "r64": 190
+      "pts": 200,
+      "pct": 12.1,
+      "max": 1700,
+      "r64": 200
     }
   ]
 }
