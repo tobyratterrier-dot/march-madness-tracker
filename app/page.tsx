@@ -583,105 +583,112 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section className="mb-4 grid grid-cols-2 gap-3">
-          <div className="rounded-2xl border border-amber-500/30 bg-amber-500/5 p-4">
-            <div className="mb-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-amber-300/80">
-              Biggest Choke Risk
-            </div>
+        <section className="mb-4 rounded-2xl border border-neutral-800 bg-neutral-900 p-3 shadow-sm sm:p-4">
+  <div className="mb-3 flex items-center justify-between">
+    <h2 className="text-base font-semibold text-white">Stats</h2>
+    <div className="text-xs text-neutral-500">live insights</div>
+  </div>
 
+  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+    <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 px-4 py-3">
+      <div className="mb-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-amber-300/80">
+        Biggest Choke Risk
+      </div>
+
+      <div className="flex items-center justify-between gap-3">
+        <div className="min-w-0">
+          <div className="truncate text-sm font-semibold text-amber-100">
+            {biggestChokeRisk}
+          </div>
+          <div className="text-xs text-amber-200/70">
+            only {remainingPoints[biggestChokeRisk]} pts of upside left
+          </div>
+        </div>
+
+        <div className="shrink-0 rounded-xl bg-amber-400/10 px-3 py-2 text-lg font-bold text-amber-300">
+          ⚠️
+        </div>
+      </div>
+    </div>
+
+    <div className="rounded-xl border border-cyan-500/30 bg-cyan-500/5 px-4 py-3">
+      <div className="mb-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-cyan-300/80">
+        Most Alive
+      </div>
+
+      <div className="flex items-center justify-between gap-3">
+        <div className="min-w-0">
+          <div className="truncate text-sm font-semibold text-cyan-100">
+            {mostAlive}
+          </div>
+          <div className="text-xs text-cyan-200/70">
+            {remainingPoints[mostAlive]} pts still in play
+          </div>
+        </div>
+
+        <div className="shrink-0 rounded-xl bg-cyan-400/10 px-3 py-2 text-lg font-bold text-cyan-300">
+          🔥
+        </div>
+      </div>
+    </div>
+
+    {(
+      <>
+        <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/5 px-4 py-3">
+          <div className="mb-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-emerald-300/80">
+            Biggest Jump
+          </div>
+
+          {biggestClimbValue > 0 ? (
             <div className="flex items-center justify-between gap-3">
               <div className="min-w-0">
-                <div className="truncate text-sm font-semibold text-amber-100">
-                  {biggestChokeRisk}
+                <div className="truncate text-sm font-semibold text-emerald-100">
+                  {biggestClimbPlayer}
                 </div>
-                <div className="text-xs text-amber-200/70">
-                  only {remainingPoints[biggestChokeRisk]} pts of upside left
+                <div className="text-xs text-emerald-200/70">
+                  climbed {biggestClimbValue} spot
+                  {biggestClimbValue === 1 ? "" : "s"}
                 </div>
               </div>
 
-              <div className="shrink-0 rounded-xl bg-amber-400/10 px-3 py-2 font-mono text-lg font-bold text-amber-300">
-                ⚠️
+              <div className="shrink-0 rounded-xl bg-emerald-400/10 px-3 py-2 font-mono text-lg font-bold text-emerald-300">
+                +{biggestClimbValue}
               </div>
             </div>
+          ) : (
+            <div className="text-xs text-neutral-400">No one moved up</div>
+          )}
+        </div>
+
+        <div className="rounded-xl border border-rose-500/30 bg-rose-500/5 px-4 py-3">
+          <div className="mb-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-rose-300/80">
+            Biggest Falloff
           </div>
 
-          <div className="rounded-2xl border border-cyan-500/30 bg-cyan-500/5 p-4">
-            <div className="mb-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-cyan-300/80">
-              Most Alive
-            </div>
-
+          {biggestFallValue < 0 ? (
             <div className="flex items-center justify-between gap-3">
               <div className="min-w-0">
-                <div className="truncate text-sm font-semibold text-cyan-100">
-                  {mostAlive}
+                <div className="truncate text-sm font-semibold text-rose-100">
+                  {biggestFallPlayer}
                 </div>
-                <div className="text-xs text-cyan-200/70">
-                  {remainingPoints[mostAlive]} pts still in play
+                <div className="text-xs text-rose-200/70">
+                  dropped {Math.abs(biggestFallValue)} spot
+                  {Math.abs(biggestFallValue) === 1 ? "" : "s"}
                 </div>
               </div>
 
-              <div className="shrink-0 rounded-xl bg-cyan-400/10 px-3 py-2 font-mono text-lg font-bold text-cyan-300">
-                🔥
+              <div className="shrink-0 rounded-xl bg-rose-400/10 px-3 py-2 font-mono text-lg font-bold text-rose-300">
+                {biggestFallValue}
               </div>
             </div>
-          </div>
-        </section>
-
-        <section className="mb-4 grid grid-cols-2 gap-3">
-          <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/5 p-4">
-            <div className="mb-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-emerald-300/80">
-              Biggest Jump Since Last Game
-            </div>
-
-            {biggestClimbValue > 0 ? (
-              <div className="flex items-center justify-between gap-3">
-                <div className="min-w-0">
-                  <div className="truncate text-sm font-semibold text-emerald-100">
-                    {biggestClimbPlayer}
-                  </div>
-                  <div className="text-xs text-emerald-200/70">
-                    climbed {biggestClimbValue} spot
-                    {biggestClimbValue === 1 ? "" : "s"}
-                  </div>
-                </div>
-
-                <div className="shrink-0 rounded-xl bg-emerald-400/10 px-3 py-2 font-mono text-lg font-bold text-emerald-300">
-                  +{biggestClimbValue}
-                </div>
-              </div>
-            ) : (
-              <div className="text-xs text-neutral-400">No one moved up!</div>
-            )}
-          </div>
-
-          <div className="rounded-2xl border border-rose-500/30 bg-rose-500/5 p-4">
-            <div className="mb-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-rose-300/80">
-              Biggest Falloff Since Last Game
-            </div>
-
-            {biggestFallValue < 0 ? (
-              <div className="flex items-center justify-between gap-3">
-                <div className="min-w-0">
-                  <div className="truncate text-sm font-semibold text-rose-100">
-                    {biggestFallPlayer}
-                  </div>
-                  <div className="text-xs text-rose-200/70">
-                    dropped {Math.abs(biggestFallValue)} spot
-                    {Math.abs(biggestFallValue) === 1 ? "" : "s"}
-                  </div>
-                </div>
-
-                <div className="shrink-0 rounded-xl bg-rose-400/10 px-3 py-2 font-mono text-lg font-bold text-rose-300">
-                  {biggestFallValue}
-                </div>
-              </div>
-            ) : (
-              <div className="text-xs text-neutral-400">
-                No one moved down!
-              </div>
-            )}
-          </div>
-        </section>
+          ) : (
+            <div className="text-xs text-neutral-400">No one moved down</div>
+          )}
+        </div>
+      </>
+    )}
+  </div>
+</section>
 
         <section className="mt-4 rounded-2xl border border-neutral-800 bg-neutral-900 p-3 shadow-sm sm:p-4">
           <div className="mb-3 flex items-center justify-between">
