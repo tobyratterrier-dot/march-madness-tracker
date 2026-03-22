@@ -446,25 +446,59 @@ const hottestGain = pointGainsToday[hottestPlayer] ?? 0;
                     </span>
                   </div>
 
-                  <div className="space-y-1">
-                    <div className="flex items-center justify-between gap-3">
-                      <span className="truncate text-sm text-neutral-300">
-                        {game.awayTeam}
-                      </span>
-                      <span className="font-mono text-base font-semibold text-neutral-200">
-                        {game.awayScore}
-                      </span>
-                    </div>
+<div className="space-y-1">
+  <div className="flex items-center justify-between gap-3">
+    <span
+      className={`truncate text-sm ${
+        game.awayScore > game.homeScore
+          ? "text-emerald-300 font-semibold"
+          : game.awayScore < game.homeScore
+          ? "text-rose-300"
+          : "text-neutral-200"
+      }`}
+    >
+      {game.awayTeam}
+    </span>
 
-                    <div className="flex items-center justify-between gap-3">
-                      <span className="truncate text-sm text-neutral-300">
-                        {game.homeTeam}
-                      </span>
-                      <span className="font-mono text-base font-semibold text-neutral-200">
-                        {game.homeScore}
-                      </span>
-                    </div>
-                  </div>
+    <span
+      className={`font-mono text-base font-semibold ${
+        game.awayScore > game.homeScore
+          ? "text-emerald-300"
+          : game.awayScore < game.homeScore
+          ? "text-rose-300"
+          : "text-white"
+      }`}
+    >
+      {game.awayScore}
+    </span>
+  </div>
+
+  <div className="flex items-center justify-between gap-3">
+    <span
+      className={`truncate text-sm ${
+        game.homeScore > game.awayScore
+          ? "text-emerald-300 font-semibold"
+          : game.homeScore < game.awayScore
+          ? "text-rose-300"
+          : "text-neutral-200"
+      }`}
+    >
+      {game.homeTeam}
+    </span>
+
+    <span
+      className={`font-mono text-base font-semibold ${
+        game.homeScore > game.awayScore
+          ? "text-emerald-300"
+          : game.homeScore < game.awayScore
+          ? "text-rose-300"
+          : "text-white"
+      }`}
+    >
+      {game.homeScore}
+    </span>
+  </div>
+</div>
                 </div>
               ))}
             </div>
