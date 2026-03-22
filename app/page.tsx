@@ -127,6 +127,8 @@ export default function HomePage() {
 const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
 const [chatName, setChatName] = useState("");
 const [chatText, setChatText] = useState("");
+const [isSendingMessage, setIsSendingMessage] = useState(false);
+const [chatStatus, setChatStatus] = useState<"" | "sent" | "error">("");
 
 // -------------------------
 // Chat
@@ -171,7 +173,10 @@ const handleSendMessage = async () => {
   const name = chatName.trim();
   const text = chatText.trim();
 
-  if (!name || !text) return;
+  if (!name || !text || isSendingMessage) return;
+
+  setIsSendingMessage(true);
+  setChatStatus("");
 
   const { error } = await supabase.from("chat_messages").insert({
     name,
@@ -180,7 +185,20 @@ const handleSendMessage = async () => {
 
   if (!error) {
     setChatText("");
+    setChatStatus("sent");
+
+    setTimeout(() => {
+      setChatStatus("");
+    }, 1500);
+  } else {
+    setChatStatus("error");
+
+    setTimeout(() => {
+      setChatStatus("");
+    }, 2000);
   }
+
+  setIsSendingMessage(false);
 };
 
 useEffect(() => {
@@ -1086,32 +1104,47 @@ const biggestLoserCount = lastPlaceCounts[biggestLoser] ?? 0;
     <div className="text-xs text-neutral-500">shared live</div>
   </div>
 
-  <div className="mb-3 grid grid-cols-1 gap-2 sm:grid-cols-[160px_1fr_auto]">
+  <div className="mb-3 space-y-2">
     <input
       value={chatName}
       onChange={(e) => setChatName(e.target.value)}
       placeholder="Your name"
       maxLength={24}
-      className="rounded-xl border border-neutral-800 bg-neutral-950 px-3 py-2 text-sm text-white outline-none placeholder:text-neutral-500"
+      className="w-full rounded-xl border border-neutral-800 bg-neutral-950 px-3 py-3 text-sm text-white outline-none placeholder:text-neutral-500"
     />
 
-    <input
-      value={chatText}
-      onChange={(e) => setChatText(e.target.value)}
-      onKeyDown={(e) => {
-        if (e.key === "Enter") handleSendMessage();
-      }}
-      placeholder="Say Something..."
-      maxLength={180}
-      className="rounded-xl border border-neutral-800 bg-neutral-950 px-3 py-2 text-sm text-white outline-none placeholder:text-neutral-500"
-    />
+    <div className="flex gap-2">
+      <input
+        value={chatText}
+        onChange={(e) => setChatText(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") handleSendMessage();
+        }}
+        placeholder="Say something..."
+        maxLength={180}
+        className="min-w-0 flex-1 rounded-xl border border-neutral-800 bg-neutral-950 px-3 py-3 text-sm text-white outline-none placeholder:text-neutral-500"
+      />
 
-    <button
-      onClick={handleSendMessage}
-      className="rounded-xl border border-neutral-700 bg-neutral-800 px-4 py-2 text-sm font-medium text-white transition hover:bg-neutral-700"
-    >
-      Send
-    </button>
+      <button
+        onClick={handleSendMessage}
+        disabled={isSendingMessage || !chatName.trim() || !chatText.trim()}
+        className={`min-w-[84px] rounded-xl border px-4 py-3 text-sm font-medium transition ${
+          isSendingMessage || !chatName.trim() || !chatText.trim()
+            ? "cursor-not-allowed border-neutral-800 bg-neutral-900 text-neutral-500"
+            : "border-neutral-700 bg-neutral-800 text-white active:scale-[0.98] hover:bg-neutral-700"
+        }`}
+      >
+        {isSendingMessage ? "Sending..." : "Send"}
+      </button>
+    </div>
+
+    {chatStatus === "sent" && (
+      <div className="text-xs text-emerald-300">Message sent</div>
+    )}
+
+    {chatStatus === "error" && (
+      <div className="text-xs text-rose-300">Couldn’t send message</div>
+    )}
   </div>
 
   <div className="space-y-2">
