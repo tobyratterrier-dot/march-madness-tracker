@@ -670,13 +670,70 @@ const biggestLoserCount = lastPlaceCounts[biggestLoser] ?? 0;
 
         <section className="mt-4 mb-4 rounded-2xl border border-neutral-800 bg-neutral-900 p-3 shadow-sm sm:p-4">
   <div className="mb-3 flex items-center justify-between">
-    <h2 className="text-base font-semibold text-white">Stats</h2>
+    <h2 className="text-base font-semibold text-white">Stat Cards</h2>
     <div className="text-xs text-neutral-500">live insights</div>
   </div>
 
   <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <div className="relative overflow-hidden rounded-2xl border border-yellow-400/60 bg-yellow-500/10 px-4 py-4 shadow-lg">
+            <div className="absolute inset-0 bg-yellow-400/10 blur-2xl" />
+            <div className="relative">
+              <div className="mb-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-yellow-300/80">
+                Current Leader
+              </div>
 
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex min-w-0 items-center gap-3">
+                  <span className="text-3xl">👑</span>
+                  <div className="min-w-0">
+                    <div className="winner-banner-text truncate text-lg font-extrabold">
+                      {leader}
+                    </div>
+                    <div className="text-xs text-yellow-100/70">Ur tuff</div>
+                  </div>
+                </div>
 
+                <div className="shrink-0 rounded-xl border border-yellow-300/40 bg-yellow-300/10 px-3 py-2 text-right">
+                  <div className="winner-banner-text font-mono text-xl font-bold">
+                    {latestScores[leader]}
+                  </div>
+                  <div className="text-[10px] text-yellow-100/70">
+                    max {liveMaxPoints[leader]}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="relative overflow-hidden rounded-2xl border border-red-500/50 bg-red-500/10 px-4 py-4 shadow-lg">
+            <div className="absolute inset-0 bg-red-500/10 blur-2xl" />
+            <div className="relative">
+              <div className="mb-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-red-300/80">
+                Current Loser
+              </div>
+
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex min-w-0 items-center gap-3">
+                  <span className="text-3xl">💀</span>
+                  <div className="min-w-0">
+                    <div className="truncate text-lg font-bold text-red-200">
+                      {loser}
+                    </div>
+                    <div className="text-xs text-red-100/70">Ur bad</div>
+                  </div>
+                </div>
+
+                <div className="shrink-0 rounded-xl border border-red-300/30 bg-red-300/10 px-3 py-2 text-right">
+                  <div className="font-mono text-xl font-bold text-red-100">
+                    {latestScores[loser]}
+                  </div>
+                  <div className="text-[10px] text-red-100/60">
+                    max {liveMaxPoints[loser]}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
 
 <div className="rounded-xl border border-orange-500/30 bg-orange-500/5 px-4 py-3">
   <div className="mb-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-orange-300/80">
@@ -955,69 +1012,6 @@ const biggestLoserCount = lastPlaceCounts[biggestLoser] ?? 0;
     </p>
   </div>
 </section>
-
-
-        <section className="mt-4 mb-4 grid gap-3">
-          <div className="relative overflow-hidden rounded-2xl border border-yellow-400/60 bg-yellow-500/10 px-4 py-4 shadow-lg">
-            <div className="absolute inset-0 bg-yellow-400/10 blur-2xl" />
-            <div className="relative">
-              <div className="mb-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-yellow-300/80">
-                Current Winner
-              </div>
-
-              <div className="flex items-center justify-between gap-3">
-                <div className="flex min-w-0 items-center gap-3">
-                  <span className="text-3xl">👑</span>
-                  <div className="min-w-0">
-                    <div className="winner-banner-text truncate text-lg font-extrabold">
-                      {leader}
-                    </div>
-                    <div className="text-xs text-yellow-100/70">Ur tuff</div>
-                  </div>
-                </div>
-
-                <div className="shrink-0 rounded-xl border border-yellow-300/40 bg-yellow-300/10 px-3 py-2 text-right">
-                  <div className="winner-banner-text font-mono text-xl font-bold">
-                    {latestScores[leader]}
-                  </div>
-                  <div className="text-[10px] text-yellow-100/70">
-                    max {liveMaxPoints[leader]}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="relative overflow-hidden rounded-2xl border border-red-500/50 bg-red-500/10 px-4 py-4 shadow-lg">
-            <div className="absolute inset-0 bg-red-500/10 blur-2xl" />
-            <div className="relative">
-              <div className="mb-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-red-300/80">
-                Current Loser
-              </div>
-
-              <div className="flex items-center justify-between gap-3">
-                <div className="flex min-w-0 items-center gap-3">
-                  <span className="text-3xl">💀</span>
-                  <div className="min-w-0">
-                    <div className="truncate text-lg font-bold text-red-200">
-                      {loser}
-                    </div>
-                    <div className="text-xs text-red-100/70">Ur bad</div>
-                  </div>
-                </div>
-
-                <div className="shrink-0 rounded-xl border border-red-300/30 bg-red-300/10 px-3 py-2 text-right">
-                  <div className="font-mono text-xl font-bold text-red-100">
-                    {latestScores[loser]}
-                  </div>
-                  <div className="text-[10px] text-red-100/60">
-                    max {liveMaxPoints[loser]}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
 
 
         <section className="mt-4 rounded-2xl border border-neutral-800 bg-neutral-900 p-3 shadow-sm sm:p-4">
