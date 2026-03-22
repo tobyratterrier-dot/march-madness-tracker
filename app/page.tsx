@@ -238,6 +238,64 @@ const hottestPlayer = useMemo(() => {
 
 const hottestGain = pointGainsToday[hottestPlayer] ?? 0;
 
+// =========================
+// BIGGEST LOSER
+// Most time spent in last place across scored history rows
+// =========================
+const lastPlaceCounts = useMemo(() => {
+  const counts = {} as Record<Player, number>;
+
+  players.forEach((player) => {
+    counts[player] = 0;
+  });
+
+  // Ignore seed row / empty rows
+  const scoredRows = chartData.filter((row) => {
+    const numericValues = players
+      .map((player) => row[player])
+      .filter((value): value is number => typeof value === "number");
+
+    return numericValues.length > 0 && numericValues.some((value) => value > 0);
+  });
+
+  scoredRows.forEach((row) => {
+    const scores = {} as Record<Player, number>;
+
+    players.forEach((player) => {
+      const value = row[player];
+      scores[player] = typeof value === "number" ? value : 0;
+    });
+
+    // Sort exactly like your leaderboard:
+    // lowest score is worst, and if tied, lower max is worse
+    const worstPlayer = [...players].sort((a, b) => {
+      const scoreDiff = scores[a] - scores[b];
+      if (scoreDiff !== 0) return scoreDiff;
+
+      const maxDiff = liveMaxPoints[a] - liveMaxPoints[b];
+      if (maxDiff !== 0) return maxDiff;
+
+      return a.localeCompare(b);
+    })[0];
+
+    counts[worstPlayer] += 1;
+  });
+
+  return counts;
+}, [chartData, liveMaxPoints]);
+
+const biggestLoser = useMemo(() => {
+  return [...players].sort((a, b) => {
+    const countDiff = lastPlaceCounts[b] - lastPlaceCounts[a];
+    if (countDiff !== 0) return countDiff;
+
+    // If tied on days-in-last, worse current rank loses
+    return sortedPlayers.indexOf(b) - sortedPlayers.indexOf(a);
+  })[0];
+}, [lastPlaceCounts, sortedPlayers]);
+
+const biggestLoserCount = lastPlaceCounts[biggestLoser] ?? 0;
+
   // ---------------------------
   // Insights
   // Biggest choke risk = top half with lowest remaining upside
@@ -553,7 +611,7 @@ const hottestGain = pointGainsToday[hottestPlayer] ?? 0;
 
     <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 px-4 py-3">
       <div className="mb-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-amber-300/80">
-        Biggest Choke Risk
+        Highest Choke Risk
       </div>
 
       <div className="flex items-center justify-between gap-3">
@@ -646,6 +704,29 @@ const hottestGain = pointGainsToday[hottestPlayer] ?? 0;
             <div className="text-xs text-neutral-400">No one moved down</div>
           )}
         </div>
+
+<div className="rounded-xl border border-red-500/30 bg-red-500/5 px-4 py-3">
+  <div className="mb-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-red-300/80">
+    Actually Bad
+  </div>
+
+  <div className="flex items-center justify-between gap-3">
+    <div className="min-w-0">
+      <div className="truncate text-sm font-semibold text-red-100">
+        {biggestLoser}
+      </div>
+      <div className="text-xs text-red-200/70">
+        last place for {biggestLoserCount} scoring day
+        {biggestLoserCount === 1 ? "" : "s"}
+      </div>
+    </div>
+
+    <div className="shrink-0 rounded-xl bg-red-400/10 px-3 py-2 text-lg font-bold text-red-300">
+      💩
+    </div>
+  </div>
+</div>
+
       </>
     )}
   </div>
