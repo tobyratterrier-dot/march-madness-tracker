@@ -1,68 +1,68 @@
 {
-  "fetchedAt": "2026-03-27T03:01:46.519Z",
+  "fetchedAt": "2026-03-27T11:50:06.000Z",
   "standings": [
     {
       "rank": 1,
-      "player": "Acuff 1.01",
-      "pts": 510,
-      "pct": 81.5,
-      "max": 1150,
-      "r64": 40
-    },
-    {
-      "rank": 1,
-      "player": "espnfan0099",
-      "pts": 510,
-      "pct": 81.5,
-      "max": 1030,
-      "r64": 40
-    },
-    {
-      "rank": 3,
-      "player": "will3burns Picks 1",
-      "pts": 480,
-      "pct": 64.6,
-      "max": 1680,
-      "r64": null
-    },
-    {
-      "rank": 3,
       "player": "PHILONPHILON",
-      "pts": 480,
-      "pct": 64.6,
+      "pts": 560,
+      "pct": 84.5,
       "max": 1400,
+      "r64": 120
+    },
+    {
+      "rank": 2,
+      "player": "Acuff 1.01",
+      "pts": 550,
+      "pct": 78,
+      "max": 1110,
+      "r64": 80
+    },
+    {
+      "rank": 2,
+      "player": "espnfan0099",
+      "pts": 550,
+      "pct": 78,
+      "max": 990,
+      "r64": 80
+    },
+    {
+      "rank": 4,
+      "player": "will3burns Picks 1",
+      "pts": 520,
+      "pct": 62,
+      "max": 1560,
       "r64": 40
     },
     {
       "rank": 5,
-      "player": "Beverly Hillbilly",
-      "pts": 460,
-      "pct": 51.6,
-      "max": 820,
-      "r64": null
+      "player": "G Goff",
+      "pts": 500,
+      "pct": 50.5,
+      "max": 1500,
+      "r64": 80
     },
     {
-      "rank": 6,
-      "player": "Cant bet against the zags",
-      "pts": 430,
-      "pct": 33.9,
-      "max": 1230,
-      "r64": null
+      "rank": 5,
+      "player": "Beverly Hillbilly",
+      "pts": 500,
+      "pct": 50.5,
+      "max": 780,
+      "r64": 40
     },
     {
       "rank": 7,
-      "player": "G Goff",
-      "pts": 420,
-      "pct": 29.3,
-      "max": 1500,
-      "r64": null
+      "player": "Cant bet against the zags",
+      "pts": 470,
+      "pct": 35.2,
+      "max": 1230,
+      "r64": 40
     },
     {
       "rank": 8,
       "player": "Slobonmyhawgggg",
       "pts": 400,
-      "pct": 21.6,
-      "max": 1600,
+      "pct": 15.1,
+      "max": 1360,
       "r64": null
     }
   ]
