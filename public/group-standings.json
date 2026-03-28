@@ -1,68 +1,68 @@
 {
-  "fetchedAt": "2026-03-28T03:27:46.129Z",
+  "fetchedAt": "2026-03-28T17:04:14.184Z",
   "standings": [
     {
       "rank": 1,
       "player": "PHILONPHILON",
-      "pts": 640,
-      "pct": 87.1,
+      "pts": 680,
+      "pct": 90.1,
       "max": 1400,
-      "r64": 200
-    },
-    {
-      "rank": 2,
-      "player": "Acuff 1.01",
-      "pts": 630,
-      "pct": 81.4,
-      "max": 1110,
-      "r64": 160
+      "r64": 240
     },
     {
       "rank": 2,
       "player": "espnfan0099",
-      "pts": 630,
-      "pct": 81.4,
+      "pts": 670,
+      "pct": 85.2,
       "max": 990,
+      "r64": 200
+    },
+    {
+      "rank": 3,
+      "player": "Acuff 1.01",
+      "pts": 630,
+      "pct": 69.7,
+      "max": 950,
       "r64": 160
     },
     {
       "rank": 4,
-      "player": "will3burns Picks 1",
-      "pts": 600,
-      "pct": 68,
-      "max": 1560,
-      "r64": 120
+      "player": "Beverly Hillbilly",
+      "pts": 620,
+      "pct": 65.3,
+      "max": 780,
+      "r64": 160
     },
     {
       "rank": 5,
-      "player": "Beverly Hillbilly",
-      "pts": 580,
-      "pct": 57.7,
-      "max": 780,
+      "player": "will3burns Picks 1",
+      "pts": 600,
+      "pct": 55.9,
+      "max": 1400,
       "r64": 120
     },
     {
       "rank": 6,
       "player": "Cant bet against the zags",
-      "pts": 550,
-      "pct": 43.4,
+      "pts": 590,
+      "pct": 51.4,
       "max": 1230,
-      "r64": 120
+      "r64": 160
     },
     {
       "rank": 7,
       "player": "G Goff",
-      "pts": 540,
-      "pct": 39.3,
-      "max": 1500,
-      "r64": 120
+      "pts": 580,
+      "pct": 47,
+      "max": 1460,
+      "r64": 160
     },
     {
       "rank": 8,
       "player": "Slobonmyhawgggg",
       "pts": 480,
-      "pct": 20.9,
-      "max": 1360,
+      "pct": 17.4,
+      "max": 1040,
       "r64": 80
     }
   ]
