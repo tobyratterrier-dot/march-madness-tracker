@@ -1,68 +1,68 @@
 {
-  "fetchedAt": "2026-03-29T02:08:01.064Z",
+  "fetchedAt": "2026-03-29T23:34:41.530Z",
   "standings": [
     {
       "rank": 1,
       "player": "PHILONPHILON",
-      "pts": 680,
-      "pct": 85.4,
-      "max": 1400,
-      "r64": null
+      "pts": 840,
+      "pct": 92,
+      "max": 1320,
+      "r64": 160
     },
     {
       "rank": 2,
-      "player": "Cant bet against the zags",
-      "pts": 670,
-      "pct": 80.6,
-      "max": 1230,
+      "player": "Beverly Hillbilly",
+      "pts": 780,
+      "pct": 54,
+      "max": 780,
+      "r64": 160
+    },
+    {
+      "rank": 3,
+      "player": "Acuff 1.01",
+      "pts": 710,
+      "pct": 56.8,
+      "max": 870,
       "r64": 80
     },
     {
-      "rank": 2,
-      "player": "espnfan0099",
-      "pts": 670,
-      "pct": 80.6,
-      "max": 990,
-      "r64": null
-    },
-    {
       "rank": 4,
-      "player": "Acuff 1.01",
-      "pts": 630,
-      "pct": 65.5,
-      "max": 950,
-      "r64": null
+      "player": "will3burns Picks 1",
+      "pts": 680,
+      "pct": 48.2,
+      "max": 1160,
+      "r64": 80
     },
     {
       "rank": 5,
-      "player": "Beverly Hillbilly",
-      "pts": 620,
-      "pct": 61.4,
-      "max": 780,
-      "r64": null
+      "player": "Cant bet against the zags",
+      "pts": 670,
+      "pct": 45.4,
+      "max": 670,
+      "r64": 80
     },
     {
-      "rank": 6,
-      "player": "will3burns Picks 1",
-      "pts": 600,
-      "pct": 52.5,
-      "max": 1400,
+      "rank": 5,
+      "player": "espnfan0099",
+      "pts": 670,
+      "pct": 45.4,
+      "max": 670,
       "r64": null
     },
     {
       "rank": 7,
       "player": "G Goff",
-      "pts": 580,
-      "pct": 44.3,
-      "max": 1460,
-      "r64": null
+      "pts": 660,
+      "pct": 42.7,
+      "max": 660,
+      "r64": 80
     },
     {
       "rank": 8,
       "player": "Slobonmyhawgggg",
       "pts": 480,
-      "pct": 16.9,
-      "max": 1040,
+      "pct": 13.1,
+      "max": 480,
       "r64": null
     }
   ]
